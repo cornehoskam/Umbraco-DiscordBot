@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UmbracoDiscord.Web", "UmbracoDiscord.Web\UmbracoDiscord.Web.csproj", "{15638FED-B737-4FC7-BAC7-4E351B51D73B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UmbracoDiscord.Bot", "UmbracoDiscord.Bot\UmbracoDiscord.Bot.csproj", "{195C704E-F3BF-4E19-B66A-11E597CFE2F6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UmbracoDiscord.Models", "UmbracoDiscord.Models\UmbracoDiscord.Models.csproj", "{5ED3D79C-3F81-4D53-B152-1671CE67D7C3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{15638FED-B737-4FC7-BAC7-4E351B51D73B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{15638FED-B737-4FC7-BAC7-4E351B51D73B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{15638FED-B737-4FC7-BAC7-4E351B51D73B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{15638FED-B737-4FC7-BAC7-4E351B51D73B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{195C704E-F3BF-4E19-B66A-11E597CFE2F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{195C704E-F3BF-4E19-B66A-11E597CFE2F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{195C704E-F3BF-4E19-B66A-11E597CFE2F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{195C704E-F3BF-4E19-B66A-11E597CFE2F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5ED3D79C-3F81-4D53-B152-1671CE67D7C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5ED3D79C-3F81-4D53-B152-1671CE67D7C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5ED3D79C-3F81-4D53-B152-1671CE67D7C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5ED3D79C-3F81-4D53-B152-1671CE67D7C3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
