@@ -2,49 +2,81 @@
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Extensions;
+using UmbracoDiscord.Bot.Classes;
 using UmbracoDiscord.ModelsBuilder;
 
 namespace UmbracoDiscord.Bot;
 
 public class BotClient
 {
-    private readonly ServiceProvider _serviceProvider;
-    private DiscordSocketClient _client;
+    private readonly IServiceProvider _serviceProvider;
+    private readonly List<DiscordSocketClient> _clients;
     
-    public BotClient(IServiceCollection services)
+    public BotClient(IServiceProvider serviceProvider)
     {
-        _client = new DiscordSocketClient();
-        _serviceProvider = services.BuildServiceProvider();
+        _serviceProvider = serviceProvider;
+        _clients = new List<DiscordSocketClient>();
+
+        var context = _serviceProvider.GetRequiredService<IUmbracoContextFactory>().EnsureUmbracoContext();
         
-        var contentService = _serviceProvider.GetRequiredService<IContentService>();
-        var clients = contentService.GetRootContent()
-            .Where(x => x.ContentType.Alias == DiscordClient.ModelTypeAlias).ToList();
+        var clients = context.UmbracoContext.Content
+            .GetAtRoot().OfType<DiscordClient>().ToList();
         
-        foreach (var client in clients)
+        foreach (var discordClient in clients)
         {
-            Task.Run(() => Startup(client.GetValue("token").ToString()));
+            var socketClient = new DiscordSocketClient();
+            
+            Task.Run(() => Startup(socketClient, discordClient));
+            
+            _clients.Add(socketClient);
         }
     }
 
-    private async Task Startup(string? token)
+    private async Task Startup(DiscordSocketClient socketClient, DiscordClient discordClient)
     {
-        _client.Log += Log;
-        _client.MessageReceived += LogAllMessages;
-        _client.MessageReceived += message => HowManyNodes(message, _serviceProvider);
+        socketClient.Log += Log;
+        socketClient.MessageReceived += LogAllMessages;
+        socketClient.MessageReceived += message => HowManyNodes(message, _serviceProvider);
 
-        await _client.LoginAsync(TokenType.Bot, token);
-        await _client.StartAsync();
+        foreach (var server in discordClient.Children.OfType<DiscordServer>())
+        {
+            var commandCollection = server.Children.OfType<CommandCollection>().FirstOrDefault();
+            if (commandCollection != null)
+            {
+                foreach (var command in commandCollection.Children?.OfType<CustomCommand>().ToList()!)
+                {
+                    socketClient.MessageReceived += message => RegisterMessages(message, command);
+                }
+            }
+        }
+        
+        await socketClient.LoginAsync(TokenType.Bot, discordClient.Token);
+        await socketClient.StartAsync();
             
         // Block this task until the program is closed.
         await Task.Delay(-1);
     }
-    
-    private Task HowManyNodes(SocketMessage arg, ServiceProvider serviceProvider)
+
+    private Task RegisterMessages(SocketMessage message, CustomCommand command)
+    {
+        if (message.Content.StartsWith($"?{command.Command}"))
+        {
+            message.Channel.SendMessageAsync(command.Response);
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private Task HowManyNodes(SocketMessage arg, IServiceProvider serviceProvider)
     {
         if (!arg.Content.StartsWith("?getnodes")) 
             return Task.CompletedTask;
-        
+
+        var server = arg.GetServerFromMessage();
         var contentService = serviceProvider.GetRequiredService<IContentService>();
         var nodes = contentService.Count();
         

@@ -1,14 +1,13 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core;
-using UmbracoDiscord.ModelsBuilder;
+﻿using Microsoft.AspNetCore.Builder;
 
 namespace UmbracoDiscord.Bot.Classes;
 
 public static class DiscordBotExtensions
 {
-    public static IServiceCollection AddDiscordBot(this IServiceCollection services)
+    public static IApplicationBuilder AddDiscordBot(this IApplicationBuilder app)
     {
+        var services = app.ApplicationServices;
         var discordClient = new BotClient(services);
-        return services;
+        return app;
     }
 }

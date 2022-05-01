@@ -46,8 +46,6 @@ namespace UmbracoDiscord
                 .AddComposers()
                 .Build();
 #pragma warning restore IDE0022 // Use expression body for methods
-
-            services.AddDiscordBot();
         }
 
         /// <summary>
@@ -57,6 +55,7 @@ namespace UmbracoDiscord
         /// <param name="env">The web hosting environment.</param>
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -74,6 +73,10 @@ namespace UmbracoDiscord
                     u.UseBackOfficeEndpoints();
                     u.UseWebsiteEndpoints();
                 });
+            
+            app.AddDiscordBot();
+
         }
     }
+
 }
