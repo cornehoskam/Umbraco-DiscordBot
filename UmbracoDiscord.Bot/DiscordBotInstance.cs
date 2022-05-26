@@ -14,12 +14,12 @@ public class DiscordBotInstance
     private readonly IUmbracoContextFactory _umbracoContextFactory;
     
     private UmbracoContextReference? _umbracoCref;
-    private Dictionary<string, string> CustomCommands { get; set; }
+    private Dictionary<(string command, string serverId), string> CustomCommands { get; set; }
     
     public DiscordBotInstance(int umbracoDiscordClientId, string umbracoDiscordClientToken, IServiceProvider serviceProvider)
     {
         var socketClient = new DiscordSocketClient();
-        CustomCommands = new Dictionary<string, string>();
+        CustomCommands = new Dictionary<(string command, string serverId), string>();
 
         _umbracoDiscordClientId = umbracoDiscordClientId;
         _umbracoContextFactory = serviceProvider.GetRequiredService<IUmbracoContextFactory>();
@@ -62,14 +62,15 @@ public class DiscordBotInstance
         _umbracoCref = _umbracoContextFactory.EnsureUmbracoContext();
     }
 
-    private Dictionary<string, string> GetCustomUmbracoServerCommands()
+    private Dictionary<(string command, string serverId), string> GetCustomUmbracoServerCommands()
     {
         if (_umbracoCref == null)
         {
-            return new Dictionary<string, string>();
+            return new Dictionary<(string command, string serverId), string>();
         }
         
         var umbracoDiscordClient = _umbracoCref.UmbracoContext.Content.GetById(_umbracoDiscordClientId); 
+        var dictionary = new Dictionary<(string command, string serverId), string>();
         foreach (var server in umbracoDiscordClient.Children.OfType<UmbracoDiscordServer>())
         {
             var umbracoCommands = server
@@ -78,19 +79,22 @@ public class DiscordBotInstance
                 .Children?.OfType<CustomCommand>().ToList();
             
             if (umbracoCommands == null || !umbracoCommands.Any()) continue;
-
-            return umbracoCommands.ToDictionary(command => $"?{command.Command}", command => command.Response)!;
+            
+            foreach (var command in umbracoCommands)
+            {
+                dictionary.Add(($"?{command.Command}", server.ServerID)!, command.Response!);
+            }
         }
-
-        return new Dictionary<string, string>();
+        return dictionary;
     }
     
     private Task HandleCustomUmbracoMessages(SocketMessage message)
     {
         var initialString = message.Content.Split()[0];
-        if (CustomCommands.ContainsKey(initialString))
+        var key = (initialString, message.GetServerFromMessage()!.Id.ToString());
+        if (CustomCommands.ContainsKey(key))
         {
-            var command = CustomCommands[initialString];
+            var command = CustomCommands[key];
             message.Channel.SendMessageAsync(command);
         }
         return Task.CompletedTask;

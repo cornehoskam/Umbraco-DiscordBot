@@ -16,7 +16,7 @@ namespace UmbracoDiscord.Bot.Classes.Helpers
 
         public static SocketGuild? GetServerFromMessage(this SocketMessage message)
         {
-            return message.GetChannelFromMessage()?.Guild;
+            return message.GetChannelFromMessage()!.Guild;
         }
     }
 }
