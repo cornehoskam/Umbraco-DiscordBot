@@ -2,38 +2,31 @@
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using UmbracoDiscord.Bot.Classes.Helpers;
-using UmbracoDiscord.Bot.Classes.Services;
 using UmbracoDiscord.ModelsBuilder;
 
 namespace UmbracoDiscord.Bot;
 
 public class DiscordBotInstance
 {
-    private readonly IServiceProvider _serviceProvider;
-    private int _umbracoDiscordClientId;
-    private IUmbracoContextFactory _umbracoContextFactory;
-    private UmbracoContextReference _umbracoContext;
+    private readonly int _umbracoDiscordClientId;
+    private readonly IUmbracoContextFactory _umbracoContextFactory;
     
-    private readonly DiscordSocketClient _socketClient;
-    
+    private UmbracoContextReference? _umbracoCref;
     private Dictionary<string, string> CustomCommands { get; set; }
     
     public DiscordBotInstance(int umbracoDiscordClientId, string umbracoDiscordClientToken, IServiceProvider serviceProvider)
     {
-        _socketClient = new DiscordSocketClient();
+        var socketClient = new DiscordSocketClient();
         CustomCommands = new Dictionary<string, string>();
 
-        _serviceProvider = serviceProvider;
         _umbracoDiscordClientId = umbracoDiscordClientId;
-        _umbracoContextFactory = _serviceProvider.GetRequiredService<IUmbracoContextFactory>();
+        _umbracoContextFactory = serviceProvider.GetRequiredService<IUmbracoContextFactory>();
 
-        _umbracoContext = _umbracoContextFactory.EnsureUmbracoContext();
+        EnsureNewUmbracoContext();
         
-        Task.Run(() => Startup(_socketClient, umbracoDiscordClientToken));
+        Task.Run(() => Startup(socketClient, umbracoDiscordClientToken));
     }
     
     private async Task Startup(DiscordSocketClient socketClient, string token)
@@ -54,8 +47,7 @@ public class DiscordBotInstance
     {
         if (arg.Content.StartsWith("?reload"))
         {
-            _umbracoContext.Dispose();
-            _umbracoContext = _umbracoContextFactory.EnsureUmbracoContext();
+            EnsureNewUmbracoContext();
             var commands = GetCustomUmbracoServerCommands();
             arg.Channel.SendMessageAsync($"Reloading {commands.Count} commands!");
             CustomCommands = commands;
@@ -64,9 +56,20 @@ public class DiscordBotInstance
         return Task.CompletedTask;
     }
 
+    private void EnsureNewUmbracoContext()
+    {
+        _umbracoCref?.Dispose();
+        _umbracoCref = _umbracoContextFactory.EnsureUmbracoContext();
+    }
+
     private Dictionary<string, string> GetCustomUmbracoServerCommands()
     {
-        var umbracoDiscordClient = _umbracoContext.UmbracoContext.Content.GetById(_umbracoDiscordClientId); 
+        if (_umbracoCref == null)
+        {
+            return new Dictionary<string, string>();
+        }
+        
+        var umbracoDiscordClient = _umbracoCref.UmbracoContext.Content.GetById(_umbracoDiscordClientId); 
         foreach (var server in umbracoDiscordClient.Children.OfType<UmbracoDiscordServer>())
         {
             var umbracoCommands = server
