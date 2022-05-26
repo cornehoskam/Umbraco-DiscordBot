@@ -7,8 +7,8 @@
 
     <ItemGroup>
         <PackageReference Include="Discord.Net" Version="3.6.0" />
-        <PackageReference Include="Umbraco.Cms" Version="9.4.3" />
-        <PackageReference Include="Umbraco.Cms.SqlCe" Version="9.4.3" />
+        <PackageReference Include="Umbraco.Cms" Version="9.5.0" />
+        <PackageReference Include="Umbraco.Cms.SqlCe" Version="9.5.0" />
         <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" />
         <PackageReference Include="uSync" Version="9.4.0" />
     </ItemGroup>
