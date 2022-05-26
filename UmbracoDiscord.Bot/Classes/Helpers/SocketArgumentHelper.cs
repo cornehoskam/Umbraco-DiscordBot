@@ -1,6 +1,6 @@
 ﻿using Discord.WebSocket;
 
-namespace UmbracoDiscord.Bot.Classes
+namespace UmbracoDiscord.Bot.Classes.Helpers
 {
     public static class SocketArgumentHelper
     {

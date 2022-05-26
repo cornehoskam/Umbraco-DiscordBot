@@ -7,6 +7,8 @@ using Microsoft.Extensions.Hosting;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Extensions;
 using UmbracoDiscord.Bot.Classes;
+using UmbracoDiscord.Bot.Classes.Extensions;
+using UmbracoDiscord.Bot.Classes.Services;
 
 namespace UmbracoDiscord
 {
@@ -46,6 +48,8 @@ namespace UmbracoDiscord
                 .AddComposers()
                 .Build();
 #pragma warning restore IDE0022 // Use expression body for methods
+
+            services.AddSingleton<IDiscordService, DiscordService>();
         }
 
         /// <summary>
