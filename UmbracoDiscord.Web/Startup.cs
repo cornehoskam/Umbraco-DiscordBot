@@ -78,7 +78,7 @@ namespace UmbracoDiscord
                     u.UseWebsiteEndpoints();
                 });
             
-            app.AddDiscordBot();
+           app.AddDiscordBot();
 
         }
     }

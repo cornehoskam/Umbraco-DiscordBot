@@ -488,3 +488,9 @@ $RECYCLE.BIN/
 # Umbraco Static Assets of Backoffice
 # Nuget package Umbraco.Cms.StaticAssets will copy them in during dotnet build
 **/wwwroot/umbraco/
+
+UmbracoDiscord.Web/umbraco/Data/Umbraco.sqlite.db
+
+UmbracoDiscord.Web/umbraco/Data/Umbraco.sqlite.db-shm
+
+UmbracoDiscord.Web/umbraco/Data/Umbraco.sqlite.db-wal

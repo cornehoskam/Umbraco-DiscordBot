@@ -7,17 +7,18 @@ namespace UmbracoDiscord
 {
     public class Program
     {
-       
         public static void Main(string[] args)
-        {
-            CreateHostBuilder(args)
+            => CreateHostBuilder(args)
                 .Build()
                 .Run();
-        }
-        
+
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .ConfigureLogging(x => x.ClearProviders())
-                .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>());
+                .ConfigureUmbracoDefaults()
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseStaticWebAssets();
+                    webBuilder.UseStartup<Startup>();
+                });
     }
 }
