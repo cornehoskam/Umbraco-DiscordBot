@@ -1,8 +1,12 @@
-﻿using Discord;
+﻿using System.Reflection;
+using System.Text;
+using Discord;
+using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Web;
+using UmbracoDiscord.Bot.Classes.Handlers;
 using UmbracoDiscord.Bot.Classes.Helpers;
 using UmbracoDiscord.ModelsBuilder;
 
@@ -14,16 +18,21 @@ public class DiscordBotInstance
     private readonly IUmbracoContextFactory _umbracoContextFactory;
     
     private UmbracoContextReference? _umbracoCref;
+    private CommandHandler _commandHandler;
     private Dictionary<(string command, string serverId), string> CustomCommands { get; set; }
     
     public DiscordBotInstance(int umbracoDiscordClientId, string umbracoDiscordClientToken, IServiceProvider serviceProvider)
     {
-        var socketClient = new DiscordSocketClient();
+        var _config = new DiscordSocketConfig { MessageCacheSize = 100 };
+        var socketClient = new DiscordSocketClient(_config);
         CustomCommands = new Dictionary<(string command, string serverId), string>();
 
         _umbracoDiscordClientId = umbracoDiscordClientId;
         _umbracoContextFactory = serviceProvider.GetRequiredService<IUmbracoContextFactory>();
+        var _commandService = serviceProvider.GetRequiredService<CommandService>();
 
+        _commandHandler = new CommandHandler(socketClient, _commandService, serviceProvider);
+        
         EnsureNewUmbracoContext();
         
         Task.Run(() => Startup(socketClient, umbracoDiscordClientToken));
@@ -35,14 +44,16 @@ public class DiscordBotInstance
 
         socketClient.MessageReceived += HandleCustomUmbracoMessages;
         socketClient.MessageReceived += ReloadCustomUmbracoMessages;
+        socketClient.MessageReceived += DumpCommands;
         
+        await _commandHandler.InstallCommandsAsync();
         await socketClient.LoginAsync(TokenType.Bot, token);
         await socketClient.StartAsync();
-            
+
         // Block this task until the program is closed.
         await Task.Delay(-1);
     }
-
+    
     private Task ReloadCustomUmbracoMessages(SocketMessage arg)
     {
         if (arg.Content.StartsWith("?reload"))
@@ -51,6 +62,27 @@ public class DiscordBotInstance
             var commands = GetCustomUmbracoServerCommands();
             arg.Channel.SendMessageAsync($"Reloading {commands.Count} commands!");
             CustomCommands = commands;
+        }
+
+        return Task.CompletedTask;
+    }
+    
+    private Task DumpCommands(SocketMessage arg)
+    {
+        if (arg.Content.StartsWith("?dump"))
+        {
+            EnsureNewUmbracoContext();
+            var commands = GetCustomUmbracoServerCommands();
+            var sb = new StringBuilder();
+            sb.Append("Currently registered commands:");
+            sb.Append("\r\n");
+            foreach (var com in commands)
+            {
+                sb.Append("-");
+                sb.Append(com.Key.command);
+                sb.Append("\r\n");
+            }
+            arg.Channel.SendMessageAsync(sb.ToString());
         }
 
         return Task.CompletedTask;
