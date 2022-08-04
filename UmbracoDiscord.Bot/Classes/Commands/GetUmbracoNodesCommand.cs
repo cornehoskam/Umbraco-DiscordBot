@@ -1,18 +1,30 @@
 ﻿using Discord.Commands;
-using Discord.WebSocket;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Cms.Web.Common.UmbracoContext;
+using Umbraco.Extensions;
 
 namespace UmbracoDiscord.Bot.Classes.Commands;
 
 public class GetUmbracoNodesCommand : ModuleBase<SocketCommandContext>
 {
-    public IUmbracoContextFactory _umbracoContextFactory { get; set; }
-    
-    [Command("test")]
-    [Summary("do a test thingy")]
-    public Task TestAsync()
+    private readonly IUmbracoContextFactory _umbracoContextFactory;
+
+    public GetUmbracoNodesCommand(IUmbracoContextFactory umbracoContextFactory)
     {
-        return ReplyAsync("test");
+        _umbracoContextFactory = umbracoContextFactory;
+    }
+
+    
+    [Command("GetUmbracoNodes")]
+    [Summary("Get the total amount of umbraco nodes")]
+    public Task GetUmbracoNodes()
+    {
+        var context = _umbracoContextFactory.EnsureUmbracoContext();
+        var rootNodes = context.UmbracoContext.Content?.GetAtRoot();
+        var total = 0;
+        foreach (var publishedContent in rootNodes)
+        {
+            total += publishedContent.Descendants().Count() + 1;
+        }
+        return ReplyAsync($"Umbraco Instance has {total} Content Nodes");
     }
 }
