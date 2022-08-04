@@ -45,17 +45,12 @@ public class CommandHandler
         var context = new SocketCommandContext(_client, message);
 
         //Use a general Catch All command first.
-        var customCommand = _commands.Search(CatchAllCommand.CatchAllCommandIdentifier).Commands.FirstOrDefault();
+        var customCommand = _commands.Search(UmbracoCatchAllCommand.CatchAllCommandIdentifier).Commands.FirstOrDefault();
         var result = await customCommand.ExecuteAsync(context, new List<object>(), new List<object>(), _serviceProvider);
         
-        // Execute the command with the command context we just
-        // created, along with the service provider for precondition checks.
-        if (!result.IsSuccess)
-        {
-            await _commands.ExecuteAsync(
-                context: context, 
-                argPos: argPos,
-                services: _serviceProvider);
-        }
+        await _commands.ExecuteAsync(
+            context: context, 
+            argPos: argPos,
+            services: _serviceProvider);
     }
 }
