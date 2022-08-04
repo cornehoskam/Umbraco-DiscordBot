@@ -19,7 +19,16 @@ public class CatchAllCommand : ModuleBase<SocketCommandContext>
     public Task CatchAll()
     {
         //Every command will enter here
-
-        return Task.FromException(new Exception());
+        var HasFoundAndExecutedCommand = false;
+        if (HasFoundAndExecutedCommand)
+        {
+            //Finish running commands.
+            return Task.CompletedTask;
+        }
+        else
+        {
+            //Continue running registered commands.
+            return Task.FromException(new Exception());
+        }
     }
 }
