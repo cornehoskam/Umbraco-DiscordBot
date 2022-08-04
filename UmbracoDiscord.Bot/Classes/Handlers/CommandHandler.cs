@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using Discord.Commands;
 using Discord.WebSocket;
+using UmbracoDiscord.Bot.Classes.Commands;
 
 namespace UmbracoDiscord.Bot.Classes.Handlers;
 
@@ -43,11 +44,18 @@ public class CommandHandler
         // Create a WebSocket-based command context based on the message
         var context = new SocketCommandContext(_client, message);
 
+        //Use a general Catch All command first.
+        var customCommand = _commands.Search(CatchAllCommand.CatchAllCommandIdentifier).Commands.FirstOrDefault();
+        var result = await customCommand.ExecuteAsync(context, new List<object>(), new List<object>(), _serviceProvider);
+        
         // Execute the command with the command context we just
         // created, along with the service provider for precondition checks.
-        await _commands.ExecuteAsync(
-            context: context, 
-            argPos: argPos,
-            services: _serviceProvider);
+        if (!result.IsSuccess)
+        {
+            await _commands.ExecuteAsync(
+                context: context, 
+                argPos: argPos,
+                services: _serviceProvider);
+        }
     }
 }
