@@ -14,39 +14,27 @@ namespace UmbracoDiscord.Bot;
 
 public class DiscordBotInstance
 {
-    private readonly int _umbracoDiscordClientId;
-    private readonly IUmbracoContextFactory _umbracoContextFactory;
-    
-    private UmbracoContextReference? _umbracoCref;
-    private CommandHandler _commandHandler;
-    private Dictionary<(string command, string serverId), string> CustomCommands { get; set; }
+    private readonly CommandHandler _commandHandler;
     
     public DiscordBotInstance(int umbracoDiscordClientId, string umbracoDiscordClientToken, IServiceProvider serviceProvider)
     {
-        var _config = new DiscordSocketConfig { MessageCacheSize = 100 };
-        var socketClient = new DiscordSocketClient(_config);
-        CustomCommands = new Dictionary<(string command, string serverId), string>();
-
-        _umbracoDiscordClientId = umbracoDiscordClientId;
-        _umbracoContextFactory = serviceProvider.GetRequiredService<IUmbracoContextFactory>();
-        var _commandService = serviceProvider.GetRequiredService<CommandService>();
-
-        _commandHandler = new CommandHandler(socketClient, _commandService, serviceProvider);
+        //Use only to instantiate Handlers & Services
+        var socketClient = new DiscordSocketClient(new DiscordSocketConfig { MessageCacheSize = 100 });
         
-        EnsureNewUmbracoContext();
+        //Create commandHandler
+        var commandService = serviceProvider.GetRequiredService<CommandService>();
+        commandService.Log += LogAsync;
+        socketClient.Log += LogAsync;
+        _commandHandler = new CommandHandler(socketClient, commandService, serviceProvider);
         
         Task.Run(() => Startup(socketClient, umbracoDiscordClientToken));
     }
     
     private async Task Startup(DiscordSocketClient socketClient, string token)
     {
-        CustomCommands = GetCustomUmbracoServerCommands();
-
-        socketClient.MessageReceived += HandleCustomUmbracoMessages;
-        socketClient.MessageReceived += ReloadCustomUmbracoMessages;
-        socketClient.MessageReceived += DumpCommands;
-        
+        //Use to configure the SocketClient Events.
         await _commandHandler.InstallCommandsAsync();
+
         await socketClient.LoginAsync(TokenType.Bot, token);
         await socketClient.StartAsync();
 
@@ -54,81 +42,18 @@ public class DiscordBotInstance
         await Task.Delay(-1);
     }
     
-    private Task ReloadCustomUmbracoMessages(SocketMessage arg)
+    private Task LogAsync(LogMessage message)
     {
-        if (arg.Content.StartsWith("?reload"))
+        if (message.Exception is CommandException cmdException)
         {
-            EnsureNewUmbracoContext();
-            var commands = GetCustomUmbracoServerCommands();
-            arg.Channel.SendMessageAsync($"Reloading {commands.Count} commands!");
-            CustomCommands = commands;
+            Console.WriteLine($"[Command/{message.Severity}] {cmdException.Command.Aliases.First()}"
+                              + $" failed to execute in {cmdException.Context.Channel}.");
+            Console.WriteLine(cmdException);
         }
+        else 
+            Console.WriteLine($"[General/{message.Severity}] {message}");
 
         return Task.CompletedTask;
     }
     
-    private Task DumpCommands(SocketMessage arg)
-    {
-        if (arg.Content.StartsWith("?dump"))
-        {
-            EnsureNewUmbracoContext();
-            var commands = GetCustomUmbracoServerCommands();
-            var sb = new StringBuilder();
-            sb.Append("Currently registered commands:");
-            sb.Append("\r\n");
-            foreach (var com in commands)
-            {
-                sb.Append("-");
-                sb.Append(com.Key.command);
-                sb.Append("\r\n");
-            }
-            arg.Channel.SendMessageAsync(sb.ToString());
-        }
-
-        return Task.CompletedTask;
-    }
-
-    private void EnsureNewUmbracoContext()
-    {
-        _umbracoCref?.Dispose();
-        _umbracoCref = _umbracoContextFactory.EnsureUmbracoContext();
-    }
-
-    private Dictionary<(string command, string serverId), string> GetCustomUmbracoServerCommands()
-    {
-        if (_umbracoCref == null)
-        {
-            return new Dictionary<(string command, string serverId), string>();
-        }
-        
-        var umbracoDiscordClient = _umbracoCref.UmbracoContext.Content.GetById(_umbracoDiscordClientId); 
-        var dictionary = new Dictionary<(string command, string serverId), string>();
-        foreach (var server in umbracoDiscordClient.Children.OfType<UmbracoDiscordServer>())
-        {
-            var umbracoCommands = server
-                .Children.OfType<CommandCollection>()
-                .FirstOrDefault()?
-                .Children?.OfType<CustomCommand>().ToList();
-            
-            if (umbracoCommands == null || !umbracoCommands.Any()) continue;
-            
-            foreach (var command in umbracoCommands)
-            {
-                dictionary.Add(($"?{command.Command}", server.ServerID)!, command.Response!);
-            }
-        }
-        return dictionary;
-    }
-    
-    private Task HandleCustomUmbracoMessages(SocketMessage message)
-    {
-        var initialString = message.Content.Split()[0];
-        var key = (initialString, message.GetServerFromMessage()!.Id.ToString());
-        if (CustomCommands.ContainsKey(key))
-        {
-            var command = CustomCommands[key];
-            message.Channel.SendMessageAsync(command);
-        }
-        return Task.CompletedTask;
-    }
 }

@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
 using UmbracoDiscord.Bot.Classes;
 using UmbracoDiscord.Bot.Classes.Extensions;
@@ -61,7 +62,6 @@ namespace UmbracoDiscord
         /// <param name="env">The web hosting environment.</param>
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

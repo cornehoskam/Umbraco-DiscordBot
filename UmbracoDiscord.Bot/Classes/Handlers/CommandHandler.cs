@@ -48,6 +48,6 @@ public class CommandHandler
         await _commands.ExecuteAsync(
             context: context, 
             argPos: argPos,
-            services: null);
+            services: _serviceProvider);
     }
 }
