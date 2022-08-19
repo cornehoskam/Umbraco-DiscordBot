@@ -18,13 +18,16 @@ public static class DiscordBotExtensions
         }
         
         var umbracoContext = app.ApplicationServices.GetRequiredService<IUmbracoContextFactory>().EnsureUmbracoContext();
-        var clients = umbracoContext.UmbracoContext.Content
+        var clients = umbracoContext.UmbracoContext?.Content?
             .GetAtRoot().OfType<UmbracoDiscordClient>().Select(x => (x.Id, x.Token)).ToList();
         umbracoContext.Dispose();
+
+        if (clients == null || !clients.Any()) 
+            return app;
         
         foreach (var discordClient in clients)
         {
-            discordService.SocketClients.Add(new DiscordBotInstance(discordClient.Id, discordClient.Token, app.ApplicationServices));
+            discordService.SocketClients.Add(new DiscordBotInstance(discordClient.Token!, app.ApplicationServices));
         }
 
         return app;
