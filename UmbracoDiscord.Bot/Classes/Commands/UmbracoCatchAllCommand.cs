@@ -37,22 +37,24 @@ public class UmbracoCatchAllCommand : ModuleBase<SocketCommandContext>
     
     private Dictionary<(string command, string serverId), string> GetCustomUmbracoServerCommands()
     {
-        var _umbracoCref = _umbracoContextFactory.EnsureUmbracoContext();
-        if (_umbracoCref == null)
-        {
-            return new Dictionary<(string command, string serverId), string>();
-        }
+        var umbracoCref = _umbracoContextFactory.EnsureUmbracoContext();
 
-        var umbracoDiscordClient = _umbracoCref.UmbracoContext.Content.GetAtRoot()
+        var umbracoDiscordClient = umbracoCref.UmbracoContext.Content?.GetAtRoot()
             .FirstOrDefault();
         
         var dictionary = new Dictionary<(string command, string serverId), string>();
-        foreach (var server in umbracoDiscordClient.Children.OfType<UmbracoDiscordServer>())
+        var servers = umbracoDiscordClient?.Children?.OfType<UmbracoDiscordServer>().ToList();
+        if (servers == null || !servers.Any())
+        {
+            return dictionary;
+        }
+        
+        foreach (var server in servers)
         {
             var umbracoCommands = server
-                .Children.OfType<CommandCollection>()
+                .Children<CommandCollection>()?
                 .FirstOrDefault()?
-                .Children?.OfType<CustomCommand>().ToList();
+                .Children<CustomCommand>()?.ToList();
             
             if (umbracoCommands == null || !umbracoCommands.Any()) continue;
             
