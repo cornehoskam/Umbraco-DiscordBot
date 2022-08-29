@@ -27,8 +27,7 @@ public class UmbracoCatchAllCommand : ModuleBase<SocketCommandContext>
         var key = (initialString, message.GetServerFromMessage()!.Id.ToString());
         if (commands.ContainsKey(key))
         {
-            var command = commands[key];
-            ReplyAsync(command);
+            ReplyAsync(commands[key].ParseTokens(Context));
         }
         
         return Task.CompletedTask;
@@ -42,11 +41,11 @@ public class UmbracoCatchAllCommand : ModuleBase<SocketCommandContext>
         var umbracoDiscordClient = umbracoCref.UmbracoContext.Content?.GetAtRoot()
             .FirstOrDefault();
         
-        var dictionary = new Dictionary<(string command, string serverId), string>();
+        var responseDictionary = new Dictionary<(string command, string serverId), string>();
         var servers = umbracoDiscordClient?.Children?.OfType<UmbracoDiscordServer>().ToList();
         if (servers == null || !servers.Any())
         {
-            return dictionary;
+            return responseDictionary;
         }
         
         foreach (var server in servers)
@@ -60,9 +59,11 @@ public class UmbracoCatchAllCommand : ModuleBase<SocketCommandContext>
             
             foreach (var command in umbracoCommands)
             {
-                dictionary.Add(($"?{command.Command}", server.ServerID)!, command.Response!);
+                var key = ($"?{command.Command}", server.ServerID);
+                var value = command.Response;
+                responseDictionary.Add(key!, value!);
             }
         }
-        return dictionary;
+        return responseDictionary;
     }
 }
