@@ -2,7 +2,6 @@
 using Discord.Commands;
 using Discord.WebSocket;
 using UmbracoDiscord.Bot.Classes.Commands;
-
 namespace UmbracoDiscord.Bot.Classes.Handlers;
 
 public class CommandHandler
