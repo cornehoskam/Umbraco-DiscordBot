@@ -10,6 +10,8 @@ using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
 using UmbracoDiscord.Bot.Classes;
 using UmbracoDiscord.Bot.Classes.Extensions;
+using UmbracoDiscord.Bot.Classes.NotificationHandlers;
+using UmbracoDiscord.Bot.Classes.Notifications;
 using UmbracoDiscord.Bot.Classes.Services;
 
 namespace UmbracoDiscord
@@ -48,6 +50,7 @@ namespace UmbracoDiscord
                 .AddBackOffice()
                 .AddWebsite()
                 .AddComposers()
+                .AddNotificationHandler<JoinedVoiceChannelNotification, SendAMessageWhenJoiningVoiceChannel>()
                 .Build();
 #pragma warning restore IDE0022 // Use expression body for methods
 
@@ -84,5 +87,4 @@ namespace UmbracoDiscord
 
         }
     }
-
 }
