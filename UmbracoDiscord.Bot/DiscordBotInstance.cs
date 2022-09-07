@@ -1,31 +1,28 @@
-﻿using System.Reflection;
-using System.Text;
-using Discord;
+﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Web;
 using UmbracoDiscord.Bot.Classes.Handlers;
-using UmbracoDiscord.Bot.Classes.Helpers;
-using UmbracoDiscord.ModelsBuilder;
 
 namespace UmbracoDiscord.Bot;
 
 public class DiscordBotInstance
 {
     private readonly CommandHandler _commandHandler;
+    private readonly VoiceChannelHandler _voiceChannelHandler;
     
     public DiscordBotInstance(string umbracoDiscordClientToken, IServiceProvider serviceProvider)
     {
         //Use only to instantiate Handlers & Services
-        var socketClient = new DiscordSocketClient(new DiscordSocketConfig { MessageCacheSize = 100 });
+        var socketClient = new DiscordSocketClient(new DiscordSocketConfig { MessageCacheSize = 100, AlwaysDownloadUsers = true});
         
         //Create commandHandler
         var commandService = serviceProvider.GetRequiredService<CommandService>();
         commandService.Log += LogAsync;
         socketClient.Log += LogAsync;
         _commandHandler = new CommandHandler(socketClient, commandService, serviceProvider);
+        
+        _voiceChannelHandler = new VoiceChannelHandler(socketClient, commandService, serviceProvider);
         
         Task.Run(() => Startup(socketClient, umbracoDiscordClientToken));
     }
@@ -34,6 +31,7 @@ public class DiscordBotInstance
     {
         //Use to configure the SocketClient Events.
         await _commandHandler.InstallCommandsAsync();
+        await _voiceChannelHandler.InstallVoiceChannelEvents();
 
         await socketClient.LoginAsync(TokenType.Bot, token);
         await socketClient.StartAsync();
