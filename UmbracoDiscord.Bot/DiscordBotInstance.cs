@@ -14,7 +14,7 @@ public class DiscordBotInstance
     public DiscordBotInstance(string umbracoDiscordClientToken, IServiceProvider serviceProvider)
     {
         //Use only to instantiate Handlers & Services
-        var socketClient = new DiscordSocketClient(new DiscordSocketConfig { MessageCacheSize = 100 });
+        var socketClient = new DiscordSocketClient(new DiscordSocketConfig { MessageCacheSize = 100, AlwaysDownloadUsers = true});
         
         //Create commandHandler
         var commandService = serviceProvider.GetRequiredService<CommandService>();
