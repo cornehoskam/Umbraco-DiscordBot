@@ -36,9 +36,15 @@ namespace UmbracoDiscord.Domain.Context
                     .HasColumnType("NUMERIC")
                     .HasDefaultValueSql("0");
 
+                entity.Property(e => e.LastMessage).HasColumnType("DATETIME");
+
                 entity.Property(e => e.ServerId).HasColumnType("STRING");
 
+                entity.Property(e => e.ServerName).HasColumnType("STRING");
+
                 entity.Property(e => e.UserId).HasColumnType("STRING");
+
+                entity.Property(e => e.UserName).HasColumnType("STRING");
             });
 
             OnModelCreatingPartial(modelBuilder);

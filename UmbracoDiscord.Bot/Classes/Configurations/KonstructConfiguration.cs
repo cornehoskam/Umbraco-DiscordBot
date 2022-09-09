@@ -19,8 +19,8 @@ public static class KonstructConfiguration
                     .DisableCreate()
                     .SetNameProperty(x => x.Id)
                     .ListView(listViewConfig => listViewConfig
-                        .AddField(p => p.ServerId).SetHeading("Server ID")
-                        .AddField(p => p.UserId).SetHeading("User ID")
+                        .AddField(p => p.ServerName).SetHeading("Server")
+                        .AddField(p => p.UserName).SetHeading("User")
                         .AddField(p => p.Experience).SetHeading("Experience")
                     )
                 )
