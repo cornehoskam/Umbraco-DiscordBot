@@ -10,7 +10,7 @@ public class TestCommand : ModuleBase<SocketCommandContext>
     [Command("test")]
     public async Task TestAsync()
     {
-        await using var context = new umbracoDiscordDbContext();
+        await using var context = new UmbracoDiscordDbContext();
         await ReplyAsync($"Database row count: {context.Stats.Count()}");
     }
 }

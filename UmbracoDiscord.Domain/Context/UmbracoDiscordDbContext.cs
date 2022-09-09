@@ -6,13 +6,13 @@ using UmbracoDiscord.Domain.Entities;
 
 namespace UmbracoDiscord.Domain.Context
 {
-    public partial class umbracoDiscordDbContext : DbContext
+    public partial class UmbracoDiscordDbContext : DbContext
     {
-        public umbracoDiscordDbContext()
+        public UmbracoDiscordDbContext()
         {
         }
 
-        public umbracoDiscordDbContext(DbContextOptions<umbracoDiscordDbContext> options)
+        public UmbracoDiscordDbContext(DbContextOptions<UmbracoDiscordDbContext> options)
             : base(options)
         {
         }
