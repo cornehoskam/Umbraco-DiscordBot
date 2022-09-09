@@ -10,6 +10,7 @@ public class DiscordBotInstance
 {
     private readonly CommandHandler _commandHandler;
     private readonly VoiceChannelHandler _voiceChannelHandler;
+    private readonly ExperienceHandler _experienceHandler;
     
     public DiscordBotInstance(string umbracoDiscordClientToken, IServiceProvider serviceProvider)
     {
@@ -23,6 +24,7 @@ public class DiscordBotInstance
         _commandHandler = new CommandHandler(socketClient, commandService, serviceProvider);
         
         _voiceChannelHandler = new VoiceChannelHandler(socketClient, commandService, serviceProvider);
+        _experienceHandler = new ExperienceHandler(socketClient, serviceProvider);
         
         Task.Run(() => Startup(socketClient, umbracoDiscordClientToken));
     }
@@ -32,6 +34,7 @@ public class DiscordBotInstance
         //Use to configure the SocketClient Events.
         await _commandHandler.InstallCommandsAsync();
         await _voiceChannelHandler.InstallVoiceChannelEvents();
+        await _experienceHandler.InstallMessageReceivedEvents();
 
         await socketClient.LoginAsync(TokenType.Bot, token);
         await socketClient.StartAsync();
