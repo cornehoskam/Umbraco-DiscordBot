@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UmbracoDiscord.Bot", "Umbra
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UmbracoDiscord.Models", "UmbracoDiscord.Models\UmbracoDiscord.Models.csproj", "{5ED3D79C-3F81-4D53-B152-1671CE67D7C3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UmbracoDiscord.Domain", "UmbracoDiscord.Domain\UmbracoDiscord.Domain.csproj", "{E69FC6EF-4F04-4590-9825-6208B1AFD817}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{5ED3D79C-3F81-4D53-B152-1671CE67D7C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5ED3D79C-3F81-4D53-B152-1671CE67D7C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5ED3D79C-3F81-4D53-B152-1671CE67D7C3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E69FC6EF-4F04-4590-9825-6208B1AFD817}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E69FC6EF-4F04-4590-9825-6208B1AFD817}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E69FC6EF-4F04-4590-9825-6208B1AFD817}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E69FC6EF-4F04-4590-9825-6208B1AFD817}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
