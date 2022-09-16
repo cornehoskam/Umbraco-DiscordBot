@@ -1,11 +1,5 @@
-﻿using System.Linq;
-using System.Text;
-using Discord.Commands;
-using Discord.WebSocket;
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.Events;
+﻿using Discord.WebSocket;
 using UmbracoDiscord.Bot.Classes.Helpers;
-using UmbracoDiscord.Bot.Classes.Notifications;
 using UmbracoDiscord.Domain.Context;
 using UmbracoDiscord.Domain.Entities;
 
@@ -37,34 +31,55 @@ public class ExperienceHandler
         }
         
         using var context = new UmbracoDiscordDbContext();
-        var update = true;
-        var stat = context.Stats.FirstOrDefault(x =>
-            x.ServerId == message.GetServerFromMessage()!.Id.ToString() &&
-            x.UserId == message.Author.Id.ToString());
-        
-        if (stat is null)
-        {
-            update = false;
-            stat = new Stats()
-            {
-                UserId = message.Author.Id.ToString(),
-                ServerId = message.GetServerFromMessage()!.Id.ToString(),
-            };
-        }
+
+        var stat = GetOrCreateStats(message, context, out var created);
         
         stat.ServerName = message.GetServerFromMessage().Name;
         stat.UserName = $"{message.Author.Username}#{message.Author.Discriminator}";
-        if (update)
+
+        if (stat.LastMessage is null || stat.LastMessage == DateTime.MinValue)
         {
-            context.Stats.Update(stat);
+            AddExperience(stat, 10);
+            message.Channel.SendMessageAsync($"{message.Author.Username} has gained 10 experience!");
         }
-        else
+        else if(stat.LastMessage.Value.AddMinutes(5) < DateTime.UtcNow)
         {
-            context.Stats.Add(stat);
+            AddExperience(stat, 10);
+            message.Channel.SendMessageAsync($"{message.Author.Username} has gained 10 experience!");
         }
 
-        stat.Experience += 10;
+        var entry = created ? context.Stats.Add(stat) : context.Stats.Update(stat);
+        
         context.SaveChanges();
         return Task.CompletedTask;
+    }
+
+    private static void AddExperience(Stats stat, int experience)
+    {
+        stat.Experience += experience;
+        stat.LastMessage = DateTime.Now.ToUniversalTime();
+    }
+
+    private Stats GetOrCreateStats(SocketMessage message, UmbracoDiscordDbContext context, out bool created)
+    {
+        var stat = context.Stats.FirstOrDefault(x =>
+            x.ServerId == message.GetServerFromMessage().Id.ToString() &&
+            x.UserId == message.Author.Id.ToString());
+
+        if (stat is not null)
+        {
+            created = false;
+            return stat;
+        }
+        
+        stat = new Stats
+        {
+            UserId = message.Author.Id.ToString(),
+            ServerId = message.GetServerFromMessage()!.Id.ToString(),
+        };
+        
+        created = true;
+
+        return stat;
     }
 }

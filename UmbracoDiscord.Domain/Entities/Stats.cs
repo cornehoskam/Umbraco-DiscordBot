@@ -10,7 +10,7 @@ namespace UmbracoDiscord.Domain.Entities
         public string UserId { get; set; } = null!;
         public string ServerName { get; set; }
         public string UserName { get; set; }
-        public byte[]? LastMessage { get; set; }
+        public DateTime? LastMessage { get; set; }
         public long Experience { get; set; }
     }
 }
