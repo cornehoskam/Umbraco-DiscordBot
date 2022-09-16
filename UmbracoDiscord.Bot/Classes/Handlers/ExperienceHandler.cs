@@ -1,4 +1,6 @@
 ﻿using Discord.WebSocket;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using UmbracoDiscord.Bot.Classes.Helpers;
 using UmbracoDiscord.Domain.Context;
 using UmbracoDiscord.Domain.Entities;
@@ -30,10 +32,11 @@ public class ExperienceHandler
             return Task.CompletedTask;
         }
         
-        using var context = new UmbracoDiscordDbContext();
-
-        var stat = GetOrCreateStats(message, context, out var created);
+        var options = serviceProvider.GetService<DbContextOptions<UmbracoDiscordDbContext>>();
+        using var context = new UmbracoDiscordDbContext(options);
         
+        var stat = GetOrCreateStats(message, context, out var created);
+
         stat.ServerName = message.GetServerFromMessage().Name;
         stat.UserName = $"{message.Author.Username}#{message.Author.Discriminator}";
 

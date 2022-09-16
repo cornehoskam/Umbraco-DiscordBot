@@ -31,8 +31,11 @@ public static class KonstructConfiguration
 
 public class StatsRepository : KonstruktRepository<StatsModel, int>
 {
-    public StatsRepository(KonstruktRepositoryContext context) : base(context)
+    private readonly UmbracoDiscordDbContext _dbContext;
+
+    public StatsRepository(KonstruktRepositoryContext context, UmbracoDiscordDbContext dbContext) : base(context)
     {
+        _dbContext = dbContext;
     }
 
     protected override int GetIdImpl(StatsModel entity)
@@ -42,8 +45,7 @@ public class StatsRepository : KonstruktRepository<StatsModel, int>
 
     protected override StatsModel GetImpl(int id)
     {
-        using var context = new UmbracoDiscordDbContext();
-        return new StatsModel(context.Stats.First(x => x.Id == id));
+        return new StatsModel(_dbContext.Stats.First(x => x.Id == id));
     }
 
     protected override StatsModel SaveImpl(StatsModel entity)
@@ -59,23 +61,20 @@ public class StatsRepository : KonstruktRepository<StatsModel, int>
 
     protected override IEnumerable<StatsModel> GetAllImpl(Expression<Func<StatsModel, bool>> whereClause, Expression<Func<StatsModel, object>> orderBy, SortDirection orderByDirection)
     {
-        using var context = new UmbracoDiscordDbContext();
-        return context.Stats.Select(x => new StatsModel(x));
+        return _dbContext.Stats.Select(x => new StatsModel(x));
     }
 
     protected override PagedResult<StatsModel> GetPagedImpl(int pageNumber, int pageSize, Expression<Func<StatsModel, bool>> whereClause, Expression<Func<StatsModel, object>> orderBy,
         SortDirection orderByDirection)
     {
-        using var context = new UmbracoDiscordDbContext();
-        return new PagedResult<StatsModel>(context.Stats.Count(), pageNumber, pageSize)
+        return new PagedResult<StatsModel>(_dbContext.Stats.Count(), pageNumber, pageSize)
         {
-            Items = context.Stats.Skip(pageSize * (pageNumber-1)).Take(pageSize).ToList().Select(x => new StatsModel(x))
+            Items = _dbContext.Stats.Skip(pageSize * (pageNumber-1)).Take(pageSize).ToList().Select(x => new StatsModel(x))
         };
     }
 
     protected override long GetCountImpl(Expression<Func<StatsModel, bool>> whereClause)
     {
-        using var context = new UmbracoDiscordDbContext();
-        return context.Stats.Count();
+        return _dbContext.Stats.Count();
     }
 }

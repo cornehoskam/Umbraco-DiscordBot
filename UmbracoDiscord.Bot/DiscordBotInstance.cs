@@ -1,8 +1,10 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using UmbracoDiscord.Bot.Classes.Handlers;
+using UmbracoDiscord.Domain.Context;
 
 namespace UmbracoDiscord.Bot;
 
@@ -19,6 +21,7 @@ public class DiscordBotInstance
         
         //Create commandHandler
         var commandService = serviceProvider.GetRequiredService<CommandService>();
+
         commandService.Log += LogAsync;
         socketClient.Log += LogAsync;
         _commandHandler = new CommandHandler(socketClient, commandService, serviceProvider);
