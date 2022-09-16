@@ -19,8 +19,7 @@ public class GetExperienceCommand : ModuleBase<SocketCommandContext>
     public async Task GetExperienceAsync(SocketUser? user = null)
     {
         var userInfo = user ?? Context.User;
-        var options = _serviceProvider.GetRequiredService<DbContextOptions<UmbracoDiscordDbContext>>();
-        await using var dbContext = new UmbracoDiscordDbContext(options);
+        await using var dbContext = new UmbracoDiscordDbContext();
             
         var stat = dbContext.Stats.FirstOrDefault(x =>
             x.UserId == userInfo.Id.ToString() && x.ServerId == Context.Guild.Id.ToString());

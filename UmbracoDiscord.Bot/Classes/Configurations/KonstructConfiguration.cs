@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using Konstrukt;
 using Konstrukt.Configuration.Builders;
 using Konstrukt.Persistence;
@@ -61,7 +61,14 @@ public class StatsRepository : KonstruktRepository<StatsModel, int>
 
     protected override IEnumerable<StatsModel> GetAllImpl(Expression<Func<StatsModel, bool>> whereClause, Expression<Func<StatsModel, object>> orderBy, SortDirection orderByDirection)
     {
-        return _dbContext.Stats.Select(x => new StatsModel(x));
+        if (orderByDirection == SortDirection.Ascending)
+        {
+            return _dbContext.Stats.Select(x => new StatsModel(x)).Where(whereClause).OrderBy(orderBy);
+        }
+        else
+        {
+            return _dbContext.Stats.Select(x => new StatsModel(x)).Where(whereClause).OrderByDescending(orderBy);
+        }
     }
 
     protected override PagedResult<StatsModel> GetPagedImpl(int pageNumber, int pageSize, Expression<Func<StatsModel, bool>> whereClause, Expression<Func<StatsModel, object>> orderBy,

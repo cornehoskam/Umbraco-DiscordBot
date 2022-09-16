@@ -32,8 +32,7 @@ public class ExperienceHandler
             return Task.CompletedTask;
         }
         
-        var options = serviceProvider.GetService<DbContextOptions<UmbracoDiscordDbContext>>();
-        using var context = new UmbracoDiscordDbContext(options);
+        using var context = new UmbracoDiscordDbContext();
         
         var stat = GetOrCreateStats(message, context, out var created);
 
