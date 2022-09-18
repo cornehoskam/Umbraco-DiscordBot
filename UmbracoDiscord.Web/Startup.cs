@@ -1,7 +1,9 @@
 using System;
 using Discord.Commands;
+using Konstrukt.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -9,10 +11,12 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
 using UmbracoDiscord.Bot.Classes;
+using UmbracoDiscord.Bot.Classes.Configurations;
 using UmbracoDiscord.Bot.Classes.Extensions;
 using UmbracoDiscord.Bot.Classes.NotificationHandlers;
 using UmbracoDiscord.Bot.Classes.Notifications;
 using UmbracoDiscord.Bot.Classes.Services;
+using UmbracoDiscord.Domain.Context;
 
 namespace UmbracoDiscord
 {
@@ -50,12 +54,15 @@ namespace UmbracoDiscord
                 .AddBackOffice()
                 .AddWebsite()
                 .AddComposers()
+                .AddKonstrukt(KonstructConfiguration.GetConfig)
                 .AddNotificationHandler<JoinedVoiceChannelNotification, SendAMessageWhenJoiningVoiceChannel>()
                 .Build();
 #pragma warning restore IDE0022 // Use expression body for methods
 
             services.AddSingleton<IDiscordService, DiscordService>();
             services.AddSingleton<CommandService>();
+            services.AddDbContext<UmbracoDiscordDbContext>(options => 
+                options.UseSqlite("Data Source=../../../UmbracoDiscord.Domain/Database/umbracoDiscord.db"));
         }
 
         /// <summary>

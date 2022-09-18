@@ -19,7 +19,7 @@ public class KickCommand : ModuleBase<SocketCommandContext>
 
         if (reason is null)
         {
-            await guildUser.KickAsync(reason);
+            await guildUser.KickAsync();
             await ReplyAsync($"Kicked {guildUser.Username}#{guildUser.Discriminator}");
             return;
         }
