@@ -42,12 +42,12 @@ public class ExperienceHandler
         if (stat.LastMessage is null || stat.LastMessage == DateTime.MinValue)
         {
             AddExperience(stat, 10);
-            message.Channel.SendMessageAsync($"{message.Author.Username} has gained 10 experience!");
+            // message.Channel.SendMessageAsync($"{message.Author.Username} has gained 10 experience!");
         }
         else if(stat.LastMessage.Value.AddMinutes(5) < DateTime.UtcNow)
         {
             AddExperience(stat, 10);
-            message.Channel.SendMessageAsync($"{message.Author.Username} has gained 10 experience!");
+            // message.Channel.SendMessageAsync($"{message.Author.Username} has gained 10 experience!");
         }
 
         var entry = created ? context.Stats.Add(stat) : context.Stats.Update(stat);

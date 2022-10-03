@@ -33,10 +33,17 @@ public class AddCommandCommand : ModuleBase<SocketCommandContext>
         if (commandCollection is not null)
         {
             var commandNode = _contentService.Create(command, commandCollection.Id, CustomCommand.ModelTypeAlias);
+            
             commandNode.SetValue("command", command.ToLower());
             commandNode.SetValue("response", response);
+            
             _contentService.SaveAndPublish(commandNode);
+            
             await ReplyAsync($"Added command {command.ToLower()} to the server!");
+        }
+        else
+        {
+            await ReplyAsync("Something went wrong adding command!");
         }
     }
 }
