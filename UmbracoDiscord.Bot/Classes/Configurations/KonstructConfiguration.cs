@@ -4,7 +4,7 @@ using Konstrukt.Configuration.Builders;
 using Konstrukt.Persistence;
 using Umbraco.Cms.Core.Models;
 using UmbracoDiscord.Domain.Context;
-using UmbracoDiscord.Domain.Models;
+using UmbracoDiscord.Domain.Entities;
 
 namespace UmbracoDiscord.Bot.Classes.Configurations;
 
@@ -14,13 +14,13 @@ public static class KonstructConfiguration
     {
         cfg.AddSection("Repositories", sectionConfig =>
             sectionConfig.Tree(treeConfig => treeConfig
-                .AddCollection<StatsModel>(x => x.Id, "Stat", "Stats", "A person entity", "icon-umb-users", "icon-umb-users", collectionConfig => collectionConfig
+                .AddCollection<Stats>(x => x.Id, "Stat", "Stats", "A person entity", "icon-umb-users", "icon-umb-users", collectionConfig => collectionConfig
                     .SetRepositoryType<StatsRepository>()
                     .DisableCreate()
-                    .SetNameProperty(x => x.Id)
+                    .SetNameProperty(x => x.UserName)
                     .ListView(listViewConfig => listViewConfig
-                        .AddField(p => p.ServerName).SetHeading("Server")
-                        .AddField(p => p.UserName).SetHeading("User")
+                        .AddField(p => p.Id).SetHeading("ID")
+                        .AddField(p => p.ServerName).SetHeading("Server Name")
                         .AddField(p => p.Experience).SetHeading("Experience")
                     )
                 )
@@ -29,7 +29,7 @@ public static class KonstructConfiguration
     }
 }
 
-public class StatsRepository : KonstruktRepository<StatsModel, int>
+public class StatsRepository : KonstruktRepository<Stats, int>
 {
     private readonly UmbracoDiscordDbContext _dbContext;
 
@@ -38,17 +38,17 @@ public class StatsRepository : KonstruktRepository<StatsModel, int>
         _dbContext = dbContext;
     }
 
-    protected override int GetIdImpl(StatsModel entity)
+    protected override int GetIdImpl(Stats entity)
     {
-        return int.Parse(entity.Id);
+        return Int32.Parse(entity.Id.ToString());
     }
 
-    protected override StatsModel GetImpl(int id)
+    protected override Stats GetImpl(int id)
     {
-        return new StatsModel(_dbContext.Stats.First(x => x.Id == id));
+        return _dbContext.Stats.First(x => x.Id == id);
     }
 
-    protected override StatsModel SaveImpl(StatsModel entity)
+    protected override Stats SaveImpl(Stats entity)
     {
         throw new NotImplementedException();
     }
@@ -59,28 +59,43 @@ public class StatsRepository : KonstruktRepository<StatsModel, int>
 
     }
 
-    protected override IEnumerable<StatsModel> GetAllImpl(Expression<Func<StatsModel, bool>> whereClause, Expression<Func<StatsModel, object>> orderBy, SortDirection orderByDirection)
+    protected override IEnumerable<Stats> GetAllImpl(Expression<Func<Stats, bool>> whereClause, Expression<Func<Stats, object>> orderBy, SortDirection orderByDirection)
     {
         if (orderByDirection == SortDirection.Ascending)
         {
-            return _dbContext.Stats.Select(x => new StatsModel(x)).Where(whereClause).OrderBy(orderBy);
+            return _dbContext.Stats.Where(whereClause).OrderBy(orderBy);
         }
         else
         {
-            return _dbContext.Stats.Select(x => new StatsModel(x)).Where(whereClause).OrderByDescending(orderBy);
+            return _dbContext.Stats.Where(whereClause).OrderByDescending(orderBy);
         }
     }
 
-    protected override PagedResult<StatsModel> GetPagedImpl(int pageNumber, int pageSize, Expression<Func<StatsModel, bool>> whereClause, Expression<Func<StatsModel, object>> orderBy,
+    protected override PagedResult<Stats> GetPagedImpl(int pageNumber, int pageSize, Expression<Func<Stats, bool>>? whereClause, Expression<Func<Stats, object>>? orderBy,
         SortDirection orderByDirection)
     {
-        return new PagedResult<StatsModel>(_dbContext.Stats.Count(), pageNumber, pageSize)
+        var items = _dbContext.Stats.Skip(pageSize * (pageNumber - 1)).Take(pageSize);
+        if (whereClause is not null)
         {
-            Items = _dbContext.Stats.Skip(pageSize * (pageNumber-1)).Take(pageSize).ToList().Select(x => new StatsModel(x))
+            items = items.Where(whereClause);
+        }
+
+        if (orderBy is not null && orderByDirection == SortDirection.Ascending)
+        {
+            items = items.OrderBy(orderBy);
+        }
+        else if (orderBy is not null && orderByDirection == SortDirection.Descending)
+        {
+            items = items.OrderByDescending(orderBy);
+        }
+        
+        return new PagedResult<Stats>(_dbContext.Stats.Count(), pageNumber, pageSize)
+        {
+            Items = items
         };
     }
 
-    protected override long GetCountImpl(Expression<Func<StatsModel, bool>> whereClause)
+    protected override long GetCountImpl(Expression<Func<Stats, bool>> whereClause)
     {
         return _dbContext.Stats.Count();
     }
