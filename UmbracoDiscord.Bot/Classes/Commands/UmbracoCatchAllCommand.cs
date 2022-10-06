@@ -23,7 +23,7 @@ public class UmbracoCatchAllCommand : ModuleBase<SocketCommandContext>
         var commands = GetCustomUmbracoServerCommands();
         var message = Context.Message;
         
-        var initialString = message.Content.Split()[0];
+        var initialString = message.Content.Split()[0].ToLower();
         var key = (initialString, message.GetServerFromMessage()!.Id.ToString());
         if (commands.ContainsKey(key))
         {
@@ -59,9 +59,12 @@ public class UmbracoCatchAllCommand : ModuleBase<SocketCommandContext>
             
             foreach (var command in umbracoCommands)
             {
-                var key = ($"?{command.Command}", server.ServerID);
-                var value = command.Response;
-                responseDictionary.Add(key!, value!);
+                var key = ($"?{command.Command}".ToLower(), server.ServerID);
+                if (!responseDictionary.ContainsKey(key))
+                {
+                    var value = command.Response;
+                    responseDictionary.Add(key!, value!);
+                }
             }
         }
         return responseDictionary;

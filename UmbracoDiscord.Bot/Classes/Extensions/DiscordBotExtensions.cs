@@ -1,10 +1,8 @@
-﻿using Discord.WebSocket;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Web;
 using UmbracoDiscord.Bot.Classes.Services;
 using UmbracoDiscord.ModelsBuilder;
-
 namespace UmbracoDiscord.Bot.Classes.Extensions;
 
 public static class DiscordBotExtensions
