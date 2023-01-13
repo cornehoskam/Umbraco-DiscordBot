@@ -38,6 +38,7 @@ public static class KonstructConfiguration
                                 });
                             });
                         })
+                        .AddCard(typeof(TotalServers))
                         .AddCard(typeof(TotalExperienceCard))
                         .AddCard("Total Users", "icon-umb-users", x => true, cardConfig =>
                         {
