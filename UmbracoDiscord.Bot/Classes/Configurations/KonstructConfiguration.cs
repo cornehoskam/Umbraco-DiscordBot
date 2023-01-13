@@ -14,29 +14,37 @@ public static class KonstructConfiguration
     {
         cfg.AddSection("Repositories", sectionConfig =>
             sectionConfig.Tree(treeConfig => treeConfig
-                .AddCollection<Stats>(x => x.Id, "Stat", "Stats", "A person entity", "icon-umb-users", "icon-umb-users", collectionConfig => collectionConfig
-                    .SetRepositoryType<StatsRepository>()
-                    .DisableCreate()
-                    .SetNameProperty(x => x.UserName)
-                    .ListView(listViewConfig => listViewConfig
-                        .AddField(p => p.Id).SetHeading("ID")
-                        .AddField(p => p.ServerName).SetHeading("Server Name")
-                        .AddField(p => p.Experience).SetHeading("Experience")
-                    ).Editor(editorConfig =>
-                    {
-                        editorConfig.AddTab("General", tabConfig =>
+                .AddCollection<Stats>(x => x.Id, "Stat", "Stats", "A person entity", "icon-umb-users", "icon-umb-users",
+                    collectionConfig => collectionConfig
+                        .SetRepositoryType<StatsRepository>()
+                        .DisableCreate()
+                        .SetNameProperty(x => x.UserName)
+                        .ListView(listViewConfig => listViewConfig
+                            .AddField(p => p.Id).SetHeading("ID")
+                            .AddField(p => p.ServerName).SetHeading("Server Name")
+                            .AddField(p => p.Experience).SetHeading("Experience")
+                        ).Editor(editorConfig =>
                         {
-                            tabConfig.AddFieldset("General", fieldsetConfig =>
+                            editorConfig.AddTab("General", tabConfig =>
                             {
-                                fieldsetConfig.AddField(p => p.UserName).SetLabel("Username").SetDescription("The username of the user");
-                                fieldsetConfig.AddField(p => p.ServerName).SetLabel("Server Name").SetDescription("The name of the server the user is on");
-                                fieldsetConfig.AddField(p => p.Experience).SetLabel("Experience").SetDescription("The amount of experience the user has");
+                                tabConfig.AddFieldset("General", fieldsetConfig =>
+                                {
+                                    fieldsetConfig.AddField(p => p.UserName).SetLabel("Username")
+                                        .SetDescription("The username of the user");
+                                    fieldsetConfig.AddField(p => p.ServerName).SetLabel("Server Name")
+                                        .SetDescription("The name of the server the user is on");
+                                    fieldsetConfig.AddField(p => p.Experience).SetLabel("Experience")
+                                        .SetDescription("The amount of experience the user has");
+                                });
                             });
-                        });
-                    } )
+                        })
+                        .AddCard(typeof(TotalExperienceCard))
+                        .AddCard("Total Users", "icon-umb-users", x => true, cardConfig =>
+                        {
+                            cardConfig.SetColor("blue");
+                        })
                 )
-            )
-        );
+            ));
     }
 }
 
