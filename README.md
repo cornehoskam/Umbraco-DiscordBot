@@ -1,11 +1,12 @@
-# Umbraco Discord Bot
+# Umbraco 11 - Discord Bot
 An experimental project I've been working on, combining the [Discord.NET](https://github.com/discord-net/Discord.Net) library with the [Umbraco CMS](https://github.com/umbraco/Umbraco-CMS).
 
 The result (so far!) is an Umbraco project in which we can configure:
  - Which Discord Bots we want to hook into, 
  - Which Discord Servers we want said bots to be able to respond to,
  - Configure custom response Commands for each server, 
- - and all of this from within Umbraco 9!
+ - Custom Gamification dashboard with the use of [Konstruct](https://getkonstrukt.net/),
+ - and all of this from within the latest version of Umbraco 11!
 
 As this is intended as an experimental & inspirational project, I would not recommend using this as a production-ready platform, but feel free to take inspiration from this!
 
