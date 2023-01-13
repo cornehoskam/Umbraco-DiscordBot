@@ -5,7 +5,7 @@ namespace UmbracoDiscord.Domain.Entities
 {
     public partial class Stats
     {
-        public long Id { get; set; }
+        public int Id { get; set; }
         public string ServerId { get; set; } = null!;
         public string UserId { get; set; } = null!;
         public string ServerName { get; set; }

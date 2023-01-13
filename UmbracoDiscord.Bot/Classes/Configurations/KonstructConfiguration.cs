@@ -22,7 +22,18 @@ public static class KonstructConfiguration
                         .AddField(p => p.Id).SetHeading("ID")
                         .AddField(p => p.ServerName).SetHeading("Server Name")
                         .AddField(p => p.Experience).SetHeading("Experience")
-                    )
+                    ).Editor(editorConfig =>
+                    {
+                        editorConfig.AddTab("General", tabConfig =>
+                        {
+                            tabConfig.AddFieldset("General", fieldsetConfig =>
+                            {
+                                fieldsetConfig.AddField(p => p.UserName).SetLabel("Username").SetDescription("The username of the user");
+                                fieldsetConfig.AddField(p => p.ServerName).SetLabel("Server Name").SetDescription("The name of the server the user is on");
+                                fieldsetConfig.AddField(p => p.Experience).SetLabel("Experience").SetDescription("The amount of experience the user has");
+                            });
+                        });
+                    } )
                 )
             )
         );
@@ -50,13 +61,14 @@ public class StatsRepository : KonstruktRepository<Stats, int>
 
     protected override Stats SaveImpl(Stats entity)
     {
-        throw new NotImplementedException();
+        _dbContext.Update(entity);
+        _dbContext.SaveChanges();
+        return entity;
     }
 
     protected override void DeleteImpl(int id)
     {
         throw new NotImplementedException();
-
     }
 
     protected override IEnumerable<Stats> GetAllImpl(Expression<Func<Stats, bool>> whereClause, Expression<Func<Stats, object>> orderBy, SortDirection orderByDirection)

@@ -3,6 +3,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using UmbracoDiscord.Bot.Classes.Examples;
 using UmbracoDiscord.Bot.Classes.Handlers;
 using UmbracoDiscord.Domain.Context;
 
@@ -25,28 +26,18 @@ public class DiscordBotInstance
         commandService.Log += LogAsync;
         socketClient.Log += LogAsync;
         
-        // socketClient.ReactionAdded += SocketClientOnReactionAdded;
+        
+        /* Example Use cases */
+        socketClient.ReactionAdded += ApproveReactionExample.SocketClientOnReactionAdded;
+        
         
         _commandHandler = new CommandHandler(socketClient, commandService, serviceProvider);
-        
         _voiceChannelHandler = new VoiceChannelHandler(socketClient, commandService, serviceProvider);
         _experienceHandler = new ExperienceHandler(socketClient, serviceProvider);
         
         Task.Run(() => Startup(socketClient, umbracoDiscordClientToken));
     }
-
-    // private static async Task SocketClientOnReactionAdded(Cacheable<IUserMessage, ulong> message, Cacheable<IMessageChannel, ulong> channel, SocketReaction reaction)
-    // {
-    //     if (message.Id == 1024013681484374026 && channel.Id == 1024013310036807773 && reaction.Emote.Name == "✅")
-    //     {
-    //         var role = (reaction.Channel as SocketGuildChannel)!.Guild.Roles.FirstOrDefault(x => x.Name == "accepted");
-    //         if (role is not null)
-    //         {
-    //             await (reaction.User.Value as IGuildUser)!.AddRoleAsync(role);
-    //         }
-    //     }
-    // }
-
+    
     private async Task Startup(DiscordSocketClient socketClient, string token)
     {
         //Use to configure the SocketClient Events.
