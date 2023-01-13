@@ -494,3 +494,5 @@ UmbracoDiscord.Web/umbraco/Data/Umbraco.sqlite.db
 UmbracoDiscord.Web/umbraco/Data/Umbraco.sqlite.db-shm
 
 UmbracoDiscord.Web/umbraco/Data/Umbraco.sqlite.db-wal
+
+UmbracoDiscord.Domain/Database/umbracoDiscord.db
