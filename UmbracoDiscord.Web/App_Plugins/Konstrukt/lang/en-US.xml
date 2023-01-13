@@ -16,5 +16,6 @@
   </area>
   <area alias="actions">
     <key alias="delete" autogen="true">Delete</key>
+    <key alias="save-and-delete" autogen="true">Save &amp; Delete</key>
   </area>
 </language>

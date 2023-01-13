@@ -1,16 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net7.0</TargetFramework>
         <RootNamespace>UmbracoDiscord</RootNamespace>
+        <LangVersion>11</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Discord.Net" Version="3.8.0" />
-        <PackageReference Include="Konstrukt" Version="1.5.1" />
-        <PackageReference Include="Umbraco.Cms" Version="10.2.0" />
+        <PackageReference Include="Konstrukt" Version="1.6.2" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
+        <PackageReference Include="Umbraco.Cms" Version="11.1.0" />
         <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" />
-        <PackageReference Include="uSync" Version="10.2.0" />
+        <PackageReference Include="uSync" Version="11.0.1" />
     </ItemGroup>
 
     <!-- Force windows to use ICU. Otherwise Windows 10 2019H1+ will do it, but older windows 10 and most if not all winodws servers will run NLS -->
